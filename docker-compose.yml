@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: go-notes-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-notes-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    env_file: .env
+    environment:
+      # Ajusta ao que a tua app usa (DATABASE_URL ou vars separadas)
+      DATABASE_URL: ${DATABASE_URL}
+      # Se a tua app precisar de PORT:
+      PORT: ${APP_PORT:-8080}
+    networks:
+      - backend
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: go-notes-caddy
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  backend:
+    driver: bridge
