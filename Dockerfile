@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ########## BUILD STAGE ##########
-FROM golang:1.22-alpine AS builder
-WORKDIR /src
+FROM golang:1.24-alpine AS builder
 
 # Dependências
 RUN apk add --no-cache git ca-certificates
