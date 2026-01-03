@@ -23,18 +23,18 @@ jobs:
       - name: test
         run: go test ./...
   
-#  deploy:
-#    needs: build-test
-#    runs-on: ubuntu-latest
-#
-#    if: github.event_name == 'workflow_dispatch'
-#    steps:
-#      - uses: appleboy/ssh-action@v1.0.3
-#        with:
-#          host: "${{ secrets.SSH_HOST }}"
-#          username: "${{ secrets.SSH_USER }}"
-#          key: "${{ secrets.SSH_KEY }}"
-#          port: 22
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "${{ secrets.SSH_HOST }}"
+          username: "${{ secrets.SSH_USER }}"
+          key: "${{ secrets.SSH_KEY }}"
+          port: 22
           script: |
             set -e
             cd /home/appuser
